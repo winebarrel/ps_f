@@ -2,7 +2,7 @@
 
 == Description
 
-ps_f emulates 'ps awxuf' on Mac OS X.
+ps_f emulates 'ps awxuf' on Mac OS X. (BSD style only)
 
 == Source Code
 
