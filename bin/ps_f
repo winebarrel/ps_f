@@ -48,8 +48,11 @@ def asm(tree, roots, pre_prefix, cmd_list, basename_only)
       pid, command = pid_cmd
 
       if basename_only
-        head, tail = command.split('-', 2) 
-        command = File.basename(head) + (tail ? '-' + tail : '')
+        head, tail = command.split(/ -/, 2) 
+        pos = head.rindex('/')
+        pos = pos ? pos + 1 : 0
+        command = head[pos..-1]
+        command += ' -' + tail if tail
       end
 
       cmd_list << [pid, pre_prefix + ' \_ '  + command]
