@@ -1,4 +1,11 @@
 #!/usr/bin/env ruby
+require 'optparse'
+
+wide = false
+opt = OptionParser.new
+opt.on('-w', '--wide') {|v| wide = v }
+opt.parse!(ARGV)
+
 out = `ps awxu -o ppid,command`
 exit 1 unless $?.success?
 
@@ -28,7 +35,7 @@ end
 
 roots = tree.select {|pid, ppid, command| ppid.zero? }
 
-def asm(tree, roots, pre_prefix, cmd_list)
+def asm(tree, roots, pre_prefix, cmd_list, basename_only)
   h = {}
 
   roots.each do |pid, ppid, command|
@@ -39,19 +46,20 @@ def asm(tree, roots, pre_prefix, cmd_list)
   h.sort_by {|a, b| a }.each do |ppid, list|
     list.sort_by {|a, b| a[0] }.each_with_index do |pid_cmd, i|
       pid, command = pid_cmd
+      command = File.basename(command) if basename_only
 
       cmd_list << [pid, pre_prefix + ' \_ '  + command]
 
       children = tree.select {|child| pid == child[1] }
       child_pre_prefix = pre_prefix + ((i < list.length - 1) ? ' |  ' : '    ')
 
-      asm(tree, children, child_pre_prefix, cmd_list)
+      asm(tree, children, child_pre_prefix, cmd_list, basename_only)
     end
   end
 end
 
 cmd_list = []
-asm(tree, roots, '', cmd_list)
+asm(tree, roots, '', cmd_list, !wide)
 
 tree_rows = cmd_list.map do |pid, command|
   row = rows[pid]
