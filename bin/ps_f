@@ -1,0 +1,101 @@
+#!/usr/bin/env ruby
+out = `ps awxu -o ppid,command`
+exit 1 unless $?.success?
+
+lines = out.to_a.map {|i| i.strip }
+
+header_line = lines.shift
+headers_border = (header_line =~ /PPID\s+COMMAND\Z/)
+
+headers = header_line.split(/\s+/).values_at(0...-2)
+additional_headers = header_line.split(/\s+/).values_at(-2..-1)
+
+rows = {}
+tree = []
+
+lines.each do |line|
+  line_head = line[0, headers_border].strip.split(/\s+/, headers.length)
+  pid = line_head[headers.index('PID')].to_i
+
+  line_head.each_with_index do |value, i|
+    rows[pid] ||= []
+    rows[pid] << value if 'COMMAND' != headers[i]
+  end
+
+  ppid, command = line[headers_border..-1].strip.split(/\s+/, additional_headers.length)
+  tree << [pid, ppid.to_i, command]
+end
+
+roots = tree.select {|pid, ppid, command| ppid.zero? }
+
+def asm(tree, roots, pre_prefix, cmd_list)
+  h = {}
+
+  roots.each do |pid, ppid, command|
+    h[ppid] ||= []
+    h[ppid] << [pid, command]
+  end
+
+  h.each do |ppid, list|
+    list.each_with_index do |pid_cmd, i|
+      pid, command = pid_cmd
+
+      cmd_list << [pid, pre_prefix + ' \_ '  + command]
+
+      children = tree.select {|child| pid == child[1] }
+      child_pre_prefix = pre_prefix + ((i < list.length - 1) ? ' |  ' : '    ')
+
+      asm(tree, children, child_pre_prefix, cmd_list)
+    end
+  end
+end
+
+cmd_list = []
+asm(tree, roots, '', cmd_list)
+
+tree_rows = cmd_list.map do |pid, command|
+  row = rows[pid]
+  row + [command[4..-1]]
+end
+
+header_row = headers.select {|i| i != 'COMMAND' } + ['COMMAND']
+tree_rows.unshift(header_row)
+
+collen_list = []
+
+tree_rows.each do |row|
+  row.each_with_index do |col, i|
+    len = collen_list[i] || 0
+    collen_list[i] = col.length if col.length > len
+  end
+end
+
+tree_lines = []
+
+tree_rows.each do |row|
+  fmt_list = []
+
+  row.each_with_index do |value, i|
+    fmt_list << (/\A[.\d]+\Z/ =~ value ? '%*s' : '%-*s')
+  end
+
+  format = fmt_list.join(' ')
+  values = collen_list.zip(row).flatten
+
+  tree_lines << (format % values).sub(/\s+\Z/, '')
+end
+
+max_cols = 0
+
+if $stdout.tty?
+  max_cols = `stty size cols 2> /dev/null`.strip.sub(/\A.*\s+/, '').first.to_i
+end
+
+if ARGV.any? {|i| /\A[a-z]+\Z/ =~ i and /w/ =~ i}
+  max_cols = 0
+end
+
+tree_lines.each do |line|
+  line = line[0, max_cols] unless max_cols.zero?
+  puts line
+end
