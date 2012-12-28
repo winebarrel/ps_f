@@ -41,7 +41,10 @@ lines.each do |line|
     rows[pid] << value unless ['COMMAND', 'CMD'].include?(headers[i])
   end
 
-  ppid, command = line[headers_border..-1].strip.split(/\s+/, additional_headers.length)
+  tail_headers_border = headers_border
+  tail_headers_border -= 1 until ' ' == line[tail_headers_border - 1, 1]
+
+  ppid, command = line[tail_headers_border..-1].strip.split(/\s+/, additional_headers.length)
   tree << [pid, ppid.to_i, command]
   pid_list << pid
 end
