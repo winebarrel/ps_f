@@ -121,7 +121,7 @@ end
 
 max_cols = 0
 
-if wide < 2 and $stdout.tty?
+if wide.zero? and $stdout.tty?
   max_cols = `stty size cols 2> /dev/null`.strip.sub(/\A.*\s+/, '').first.to_i
 end
 
