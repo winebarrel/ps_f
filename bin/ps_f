@@ -1,13 +1,23 @@
 #!/usr/bin/env ruby
-require 'optparse'
-Version = '0.1.6'
-
+ps_opts = (ARGV[0] || '').dup
 wide = false
-opt = OptionParser.new
-opt.on('-w', '--wide') {|v| wide = v }
-opt.parse!(ARGV)
 
-out = `ps awxu -o ppid,command`
+if /\A-/ =~ ps_opts
+  system("ps #{ARGV.join(' ')}")
+  $stderr.puts('warning: BSD style only')
+  exit($?.success? ? 0 : 1)
+end
+
+unless ps_opts.empty? or /f/ =~ ps_opts
+  system("ps #{ARGV.join(' ')}")
+  exit($?.success? ? 0 : 1)
+end
+
+ps_opts.gsub!('f', '') if /f/ =~ ps_opts
+ps_opts << 'u' if (ps_opts.empty? or /u/ !~ ps_opts)
+wide = true if /w/ =~ ps_opts
+
+out = `ps #{ps_opts} -o ppid,command`
 exit 1 unless $?.success?
 
 lines = out.to_a.map {|i| i.strip }
@@ -20,6 +30,7 @@ additional_headers = header_line.split(/\s+/).values_at(-2..-1)
 
 rows = {}
 tree = []
+pid_list = []
 
 lines.each do |line|
   line_head = line[0, headers_border].strip.split(/\s+/, headers.length)
@@ -27,14 +38,15 @@ lines.each do |line|
 
   line_head.each_with_index do |value, i|
     rows[pid] ||= []
-    rows[pid] << value if 'COMMAND' != headers[i]
+    rows[pid] << value unless ['COMMAND', 'CMD'].include?(headers[i])
   end
 
   ppid, command = line[headers_border..-1].strip.split(/\s+/, additional_headers.length)
   tree << [pid, ppid.to_i, command]
+  pid_list << pid
 end
 
-roots = tree.select {|pid, ppid, command| ppid.zero? }
+roots = tree.select {|pid, ppid, command| not pid_list.include?(ppid) }
 
 def asm(tree, roots, pre_prefix, cmd_list, basename_only)
   h = {}
@@ -107,7 +119,7 @@ end
 
 max_cols = 0
 
-if $stdout.tty?
+if not wide and $stdout.tty?
   max_cols = `stty size cols 2> /dev/null`.strip.sub(/\A.*\s+/, '').first.to_i
 end
 
