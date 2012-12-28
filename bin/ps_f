@@ -76,7 +76,7 @@ tree_rows.each do |row|
   fmt_list = []
 
   row.each_with_index do |value, i|
-    fmt_list << (/\A[.\d]+\Z/ =~ value ? '%*s' : '%-*s')
+    fmt_list << (/\A[.:\d]+(AM|PM)?\Z/ =~ value ? '%*s' : '%-*s')
   end
 
   format = fmt_list.join(' ')
