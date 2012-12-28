@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 ps_opts = (ARGV[0] || '').dup
-wide = false
 
 if /\A-/ =~ ps_opts
   system("ps #{ARGV.join(' ')}")
@@ -15,7 +14,7 @@ end
 
 ps_opts.gsub!('f', '') if /f/ =~ ps_opts
 ps_opts << 'u' if (ps_opts.empty? or /u/ !~ ps_opts)
-wide = true if /w/ =~ ps_opts
+wide = ps_opts.scan('w').length
 
 out = `ps #{ps_opts} -o ppid,command`
 exit 1 unless $?.success?
@@ -86,7 +85,7 @@ def asm(tree, roots, pre_prefix, cmd_list, basename_only)
 end
 
 cmd_list = []
-asm(tree, roots, '', cmd_list, !wide)
+asm(tree, roots, '', cmd_list, wide < 2)
 
 tree_rows = cmd_list.map do |pid, command|
   row = rows[pid]
@@ -122,7 +121,7 @@ end
 
 max_cols = 0
 
-if not wide and $stdout.tty?
+if wide < 2 and $stdout.tty?
   max_cols = `stty size cols 2> /dev/null`.strip.sub(/\A.*\s+/, '').first.to_i
 end
 
