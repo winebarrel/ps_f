@@ -14,7 +14,7 @@ gem install ps_f
 
 == Example
 
-  shell> ps_f
+  shell> ps_f axf
   USER           PID   %CPU %MEM VSZ     RSS    TT   STAT STARTED TIME     COMMAND
   root               1  0.0  0.0 2512260   2160 ??   Ss   9:05AM  0:09.81  launchd
   sugawara         260  0.0  0.1 2563928  13648 ??   Ss   9:05AM  0:01.49   \_ com.apple.dock.extra
