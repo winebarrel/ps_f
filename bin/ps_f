@@ -91,10 +91,6 @@ if $stdout.tty?
   max_cols = `stty size cols 2> /dev/null`.strip.sub(/\A.*\s+/, '').first.to_i
 end
 
-if ARGV.any? {|i| /\A[a-z]+\Z/ =~ i and /w/ =~ i}
-  max_cols = 0
-end
-
 tree_lines.each do |line|
   line = line[0, max_cols] unless max_cols.zero?
   puts line
