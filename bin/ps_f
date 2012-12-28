@@ -36,8 +36,8 @@ def asm(tree, roots, pre_prefix, cmd_list)
     h[ppid] << [pid, command]
   end
 
-  h.each do |ppid, list|
-    list.each_with_index do |pid_cmd, i|
+  h.sort_by {|a, b| a }.each do |ppid, list|
+    list.sort_by {|a, b| a[0] }.each_with_index do |pid_cmd, i|
       pid, command = pid_cmd
 
       cmd_list << [pid, pre_prefix + ' \_ '  + command]
