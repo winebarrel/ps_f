@@ -16,15 +16,15 @@ gem install ps_f
 
   shell> ps_f
   USER           PID   %CPU %MEM VSZ     RSS    TT   STAT STARTED TIME     COMMAND
-  root               1  0.0  0.0 2512260   2160 ??   Ss   9:05AM  0:09.81  /sbin/launchd
+  root               1  0.0  0.0 2512260   2160 ??   Ss   9:05AM  0:09.81  launchd
   sugawara         260  0.0  0.1 2563928  13648 ??   Ss   9:05AM  0:01.49   \_ com.apple.dock.extra
-  sugawara         231  0.0  0.0 2511704   1756 ??   Ss   9:05AM  0:04.48   \_ /sbin/launchd
-  sugawara         718  1.6  0.8 3793428 131332 ??   S    9:07AM  2:37.60   |   \_ /Applications/iTerm.app/Contents/MacOS/
+  sugawara         231  0.0  0.0 2511704   1756 ??   Ss   9:05AM  0:04.48   \_ launchd
+  sugawara         718  1.6  0.8 3793428 131332 ??   S    9:07AM  2:37.60   |   \_ iTerm -psn_0_208947
   root            3453  0.0  0.0 2479984   2288 s001 Ss   9:50AM  0:00.02   |   |   \_ login -fp sugawara
   sugawara        3454  0.0  0.0 2435492   2104 s001 S+   9:50AM  0:00.04   |   |   |   \_ -bash
   root           10710  0.0  0.0 2490224   2328 s003 Ss   12:11PM 0:00.01   |   |   \_ login -fp sugawara
-  sugawara         672  0.3  1.4 1465496 231208 ??   S    9:07AM  7:19.22   |   \_ /Applications/Google Chrome.app/Content
-  sugawara       18426  2.9  0.3  908880  57228 ??   S    2:40PM  0:16.89   |   |   \_ /Applications/Google Chrome.app/Con
-  sugawara        7838  0.0  0.3  908424  54156 ??   S    11:18AM 0:02.44   |   |   \_ /Applications/Google Chrome.app/Con
-  sugawara        4054  0.0  0.4  915828  71916 ??   S    10:02AM 0:05.18   |   |   \_ /Applications/Google Chrome.app/Con
+  sugawara         672  0.3  1.4 1465496 231208 ??   S    9:07AM  7:19.22   |   \_ Google Chrome -psn_0_155686
+  sugawara       18426  2.9  0.3  908880  57228 ??   S    2:40PM  0:16.89   |   |   \_ Google Chrome Helper --type=rendere
+  sugawara        7838  0.0  0.3  908424  54156 ??   S    11:18AM 0:02.44   |   |   \_ Google Chrome Helper --type=rendere
+  sugawara        4054  0.0  0.4  915828  71916 ??   S    10:02AM 0:05.18   |   |   \_ Google Chrome Helper --type=rendere
   ...
