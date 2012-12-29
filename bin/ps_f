@@ -122,7 +122,7 @@ end
 max_cols = 0
 
 if wide.zero? and $stdout.tty?
-  max_cols = `stty size cols 2> /dev/null`.strip.sub(/\A.*\s+/, '').first.to_i
+  max_cols = `stty size cols 2> /dev/null`.strip.sub(/\A.*\s+/, '').to_i
 end
 
 tree_lines.each do |line|
