@@ -19,7 +19,7 @@ wide = ps_opts.scan('w').length
 out = `ps #{ps_opts} -o ppid,command`
 exit 1 unless $?.success?
 
-lines = out.to_a.map {|i| i.strip }
+lines = out.split(/\n/).map {|i| i.strip }
 
 header_line = lines.shift
 headers_border = (header_line =~ /PPID\s+COMMAND\Z/)
